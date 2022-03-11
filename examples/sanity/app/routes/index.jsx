@@ -18,7 +18,7 @@ export function links() {
 
 export async function loader() {
   const movies = await getClient().fetch(
-    `*[_type == "movie"]{ _id, title, slug }`
+    '*[_type == "movie"]{ _id, title, slug }'
   );
 
   return { movies };

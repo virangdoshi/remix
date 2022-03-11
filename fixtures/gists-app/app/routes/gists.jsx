@@ -8,7 +8,7 @@ export function links() {
 }
 
 export async function loader() {
-  let data = {
+  const data = {
     users: [
       { id: "ryanflorence", name: "Ryan Florence" },
       { id: "mjackson", name: "Michael Jackson" }
@@ -28,13 +28,13 @@ export function headers({ loaderHeaders }) {
   };
 }
 
-export let handle = {
+export const handle = {
   breadcrumb: () => <Link to="/gists">Gists</Link>
 };
 
 export default function Gists() {
-  let locationPending = useTransition().location;
-  let { users } = useLoaderData();
+  const locationPending = useTransition().location;
+  const { users } = useLoaderData();
 
   return (
     <div data-test-id="/gists">

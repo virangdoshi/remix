@@ -14,7 +14,7 @@ export async function loader({ request, params }) {
 
   // Query for _all_ documents with this slug
   // There could be two: Draft and Published!
-  const query = `*[_type == "movie" && slug.current == $slug]`;
+  const query = '*[_type == "movie" && slug.current == $slug]';
   const queryParams = { slug: params.slug };
   const initialData = await getClient(preview).fetch(query, queryParams);
 
@@ -55,7 +55,7 @@ export default function Movie() {
           src={urlFor(movie.poster).width(400).height(200)}
           width="400"
           height="200"
-          alt={movie?.title ?? ``}
+          alt={movie?.title ?? ""}
         />
       ) : null}
       {movie?.overview?.length ? (

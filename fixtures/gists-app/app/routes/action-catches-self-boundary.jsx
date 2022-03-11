@@ -16,7 +16,7 @@ export default function ActionCatchesSelfBoundary() {
 }
 
 export function CatchBoundary() {
-  let caught = useCatch();
+  const caught = useCatch();
 
   return (
     <div data-test-id="/action-catches-self-boundary">

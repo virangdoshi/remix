@@ -1,7 +1,7 @@
 import { Link, json, useCatch, useLocation } from "remix";
 
 export async function loader({ request }) {
-  let url = new URL(request.url);
+  const url = new URL(request.url);
   if (url.searchParams.get("authed")) {
     return {};
   }
@@ -10,7 +10,7 @@ export async function loader({ request }) {
 }
 
 export default function LoaderCatchesNested() {
-  let location = useLocation();
+  const location = useLocation();
   return (
     <>
       <h2>Yay, your're authenticated!</h2>
@@ -20,8 +20,8 @@ export default function LoaderCatchesNested() {
 }
 
 export function CatchBoundary() {
-  let caught = useCatch();
-  let location = useLocation();
+  const caught = useCatch();
+  const location = useLocation();
 
   return (
     <div data-test-id="/loader-errors/nested-catch">
