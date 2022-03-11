@@ -1,6 +1,6 @@
 import { Link, json, redirect, useLoaderData, useParams } from "remix";
 
-let fakeGists = [
+const fakeGists = [
   {
     url: "https://api.github.com/gists/610613b54e5b34f8122d1ba4a3da21a9",
     id: "610613b54e5b34f8122d1ba4a3da21a9",
@@ -18,7 +18,7 @@ let fakeGists = [
 ];
 
 export async function loader({ params }) {
-  let { username } = params;
+  const { username } = params;
 
   if (username === "mjijackson") {
     return redirect("/gists/mjackson", 302);
@@ -32,7 +32,9 @@ export async function loader({ params }) {
     return fakeGists;
   }
 
-  let response = await fetch(`https://api.github.com/users/${username}/gists`);
+  const response = await fetch(
+    `https://api.github.com/users/${username}/gists`
+  );
 
   return json(await response.json(), {
     headers: {
@@ -48,7 +50,7 @@ export function headers() {
 }
 
 export function meta({ data, params }) {
-  let { username } = params;
+  const { username } = params;
   return {
     title: data
       ? `${data.length} gists from ${username}`
@@ -57,15 +59,15 @@ export function meta({ data, params }) {
   };
 }
 
-export let handle = {
+export const handle = {
   breadcrumb: ({ params }) => (
     <Link to={`gists/${params.username}`}>{params.username}</Link>
   )
 };
 
 export default function UserGists() {
-  let { username } = useParams();
-  let data = useLoaderData();
+  const { username } = useParams();
+  const data = useLoaderData();
 
   return (
     <div data-test-id="/gists/$username">

@@ -7,7 +7,7 @@ function isBareModuleId(id) {
   return !id.startsWith(".") && !path.isAbsolute(id);
 }
 
-let executableBanner = "#!/usr/bin/env node\n";
+const executableBanner = "#!/usr/bin/env node\n";
 
 function createBanner(libraryName, version) {
   return `/**
@@ -28,9 +28,9 @@ function getVersion(sourceDir) {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function createRemix() {
-  let SOURCE_DIR = "packages/create-remix";
-  let OUTPUT_DIR = "build/node_modules/create-remix";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/create-remix";
+  const OUTPUT_DIR = "build/node_modules/create-remix";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -52,7 +52,7 @@ function createRemix() {
         nodeResolve({ extensions: [".ts"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR },
             {
@@ -68,9 +68,9 @@ function createRemix() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remix() {
-  let SOURCE_DIR = "packages/remix";
-  let OUTPUT_DIR = "build/node_modules/remix";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix";
+  const OUTPUT_DIR = "build/node_modules/remix";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -91,7 +91,7 @@ function remix() {
         }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
           ]
@@ -121,9 +121,9 @@ function remix() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixDev() {
-  let SOURCE_DIR = "packages/remix-dev";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/dev";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-dev";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/dev";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -152,7 +152,7 @@ function remixDev() {
         nodeResolve({ extensions: [".ts"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR },
             {
@@ -198,9 +198,9 @@ function remixDev() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixServerRuntime() {
-  let SOURCE_DIR = "packages/remix-server-runtime";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/server-runtime";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-server-runtime";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/server-runtime";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -224,7 +224,7 @@ function remixServerRuntime() {
         nodeResolve({ extensions: [".ts", ".tsx"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
           ]
@@ -292,9 +292,9 @@ function remixServerRuntime() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixNode() {
-  let SOURCE_DIR = "packages/remix-node";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/node";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-node";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/node";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -318,7 +318,7 @@ function remixNode() {
         nodeResolve({ extensions: [".ts", ".tsx"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
           ]
@@ -366,9 +366,9 @@ function remixNode() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixCloudflareWorkers() {
-  let SOURCE_DIR = "packages/remix-cloudflare-workers";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/cloudflare-workers";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-cloudflare-workers";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/cloudflare-workers";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -432,9 +432,9 @@ function remixCloudflareWorkers() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixCloudflarePages() {
-  let SOURCE_DIR = "packages/remix-cloudflare-pages";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/cloudflare-pages";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-cloudflare-pages";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/cloudflare-pages";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -498,10 +498,10 @@ function remixCloudflarePages() {
 
 /** @return {import("rollup").RollupOptions} */
 function getServerConfig(name) {
-  let LIBRARY_NAME = `@remix-run/${name}`;
-  let SOURCE_DIR = `packages/remix-${name}`;
-  let OUTPUT_DIR = `build/node_modules/${LIBRARY_NAME}`;
-  let version = getVersion(SOURCE_DIR);
+  const LIBRARY_NAME = `@remix-run/${name}`;
+  const SOURCE_DIR = `packages/remix-${name}`;
+  const OUTPUT_DIR = `build/node_modules/${LIBRARY_NAME}`;
+  const version = getVersion(SOURCE_DIR);
 
   return {
     external(id) {
@@ -524,7 +524,7 @@ function getServerConfig(name) {
       nodeResolve({ extensions: [".ts", ".tsx"] }),
       copy({
         targets: [
-          { src: `LICENSE.md`, dest: OUTPUT_DIR },
+          { src: "LICENSE.md", dest: OUTPUT_DIR },
           { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
           { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
         ]
@@ -547,14 +547,14 @@ function remixServerAdapters() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixReact() {
-  let SOURCE_DIR = "packages/remix-react";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/react";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-react";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/react";
+  const version = getVersion(SOURCE_DIR);
 
   /** @type {import("rollup").RollupOptions} */
   // This CommonJS build of remix-react is for node; both for use in running our
   // server and for 3rd party tools that work with node.
-  let remixReactCJS = {
+  const remixReactCJS = {
     external(id) {
       return isBareModuleId(id);
     },
@@ -575,7 +575,7 @@ function remixReact() {
       nodeResolve({ extensions: [".ts", ".tsx"] }),
       copy({
         targets: [
-          { src: `LICENSE.md`, dest: OUTPUT_DIR },
+          { src: "LICENSE.md", dest: OUTPUT_DIR },
           { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
           { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
         ]
@@ -585,7 +585,7 @@ function remixReact() {
 
   // The browser build of remix-react is ESM so we can treeshake it.
   /** @type {import("rollup").RollupOptions} */
-  let remixReactESM = {
+  const remixReactESM = {
     external(id) {
       return isBareModuleId(id);
     },
@@ -607,7 +607,7 @@ function remixReact() {
   };
 
   /** @returns {import("rollup").RollupOptions[]} */
-  let remixReactMagicExportsCJS = {
+  const remixReactMagicExportsCJS = {
     external() {
       return true;
     },
@@ -627,7 +627,7 @@ function remixReact() {
   };
 
   /** @returns {import("rollup").RollupOptions[]} */
-  let remixReactMagicExportsESM = {
+  const remixReactMagicExportsESM = {
     external() {
       return true;
     },
@@ -656,9 +656,9 @@ function remixReact() {
 
 /** @returns {import("rollup").RollupOptions[]} */
 function remixServe() {
-  let SOURCE_DIR = "packages/remix-serve";
-  let OUTPUT_DIR = "build/node_modules/@remix-run/serve";
-  let version = getVersion(SOURCE_DIR);
+  const SOURCE_DIR = "packages/remix-serve";
+  const OUTPUT_DIR = "build/node_modules/@remix-run/serve";
+  const version = getVersion(SOURCE_DIR);
 
   return [
     {
@@ -682,7 +682,7 @@ function remixServe() {
         nodeResolve({ extensions: [".ts", ".tsx"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: OUTPUT_DIR },
+            { src: "LICENSE.md", dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/package.json`, dest: OUTPUT_DIR },
             { src: `${SOURCE_DIR}/README.md`, dest: OUTPUT_DIR }
           ]
@@ -712,7 +712,7 @@ function remixServe() {
 }
 
 export default function rollup(options) {
-  let builds = [
+  const builds = [
     ...createRemix(options),
     ...remix(options),
     ...remixDev(options),

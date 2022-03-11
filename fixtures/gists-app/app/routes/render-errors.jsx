@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from "remix";
 
 export default function RenderErrors() {
-  let location = useLocation();
-  let params = new URLSearchParams(location.search);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
   if (params.has("throw")) {
     throw new Error("I am a render error!");
   }

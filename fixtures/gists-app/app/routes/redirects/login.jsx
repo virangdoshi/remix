@@ -6,7 +6,7 @@ import {
   useLoaderData
 } from "remix";
 
-let sessionStorage = createCookieSessionStorage({
+const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: "redirectslogin",
     path: "/",
@@ -16,8 +16,10 @@ let sessionStorage = createCookieSessionStorage({
   }
 });
 
-export let action = async ({ request }) => {
-  let session = await sessionStorage.getSession(request.headers.get("Cookie"));
+export const action = async ({ request }) => {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
   session.flash("done", "yes");
 
   throw redirect("/redirects/login", {
@@ -27,8 +29,10 @@ export let action = async ({ request }) => {
   });
 };
 
-export let loader = async ({ request }) => {
-  let session = await sessionStorage.getSession(request.headers.get("Cookie"));
+export const loader = async ({ request }) => {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
   return json(!!session.get("done"), {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session)
@@ -37,7 +41,7 @@ export let loader = async ({ request }) => {
 };
 
 export default function Login() {
-  let done = useLoaderData();
+  const done = useLoaderData();
 
   return (
     <div>

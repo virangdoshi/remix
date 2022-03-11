@@ -1,7 +1,7 @@
 import { json, Outlet } from "remix";
 
 export async function loader({ request }) {
-  let params = new URL(request.url).searchParams;
+  const params = new URL(request.url).searchParams;
   if (params.has("throw")) {
     throw new Error("I am a loader error!");
   }

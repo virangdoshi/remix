@@ -1,6 +1,6 @@
 import { useLoaderData } from "remix";
 
-let fakeGists = [
+const fakeGists = [
   {
     url: "https://api.github.com/gists/610613b54e5b34f8122d1ba4a3da21a9",
     id: "610613b54e5b34f8122d1ba4a3da21a9",
@@ -22,7 +22,7 @@ export async function loader() {
     return Promise.resolve(fakeGists);
   }
 
-  let res = await fetch(`https://api.github.com/gists`);
+  const res = await fetch("https://api.github.com/gists");
   return res.json();
 }
 
@@ -39,12 +39,12 @@ export function meta() {
   };
 }
 
-export let handle = {
+export const handle = {
   breadcrumb: () => <span>Public</span>
 };
 
 export default function GistsIndex() {
-  let data = useLoaderData();
+  const data = useLoaderData();
 
   return (
     <div data-test-id="/gists/index">

@@ -29,7 +29,7 @@ export default function ActionCatches() {
 }
 
 export function CatchBoundary() {
-  let caught = useCatch();
+  const caught = useCatch();
 
   return (
     <div data-test-id="/action-catches-from-loader-self-boundary">

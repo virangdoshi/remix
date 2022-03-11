@@ -31,11 +31,11 @@ export async function loader({ request }) {
   };
 }
 
-export let handle = {
+export const handle = {
   breadcrumb: () => <Link to="/">Home</Link>
 };
 
-export let unstable_shouldReload = () => false;
+export const unstable_shouldReload = () => false;
 
 export default function Root() {
   useEffect(() => {
@@ -43,8 +43,8 @@ export default function Root() {
     window.reactIsHydrated = true;
   });
 
-  let data = useLoaderData();
-  let matches = useMatches();
+  const data = useLoaderData();
+  const matches = useMatches();
 
   return (
     <html lang="en">
@@ -78,7 +78,7 @@ export default function Root() {
 }
 
 export function CatchBoundary() {
-  let caught = useCatch();
+  const caught = useCatch();
 
   useEffect(() => {
     // We use this in the tests to wait for React to hydrate the page.
