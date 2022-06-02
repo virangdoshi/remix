@@ -1,32 +1,118 @@
 import * as path from "path";
 import os from "os";
+import { execSync } from "child_process";
 import * as fse from "fs-extra";
 import exitHook from "exit-hook";
+import ora from "ora";
 import prettyMs from "pretty-ms";
 import WebSocket from "ws";
 import type { Server } from "http";
 import type * as Express from "express";
 import type { createApp as createAppType } from "@remix-run/serve";
+import getPort, { makeRange } from "get-port";
 
 import { BuildMode, isBuildMode } from "../build";
+import * as colors from "../colors";
 import * as compiler from "../compiler";
 import type { RemixConfig } from "../config";
 import { readConfig } from "../config";
 import { formatRoutes, RoutesFormat, isRoutesFormat } from "../config/format";
-import { setupRemix, isSetupPlatform, SetupPlatform } from "../setup";
+import { createApp } from "./create";
+import { loadEnv } from "../env";
+import { log } from "../logging";
+import { setupRemix, isSetupPlatform, SetupPlatform } from "./setup";
+
+export * as migrate from "./migrate";
+
+export async function create({
+  appTemplate,
+  projectDir,
+  remixVersion,
+  installDeps,
+  packageManager,
+  useTypeScript,
+  githubToken,
+  debug,
+}: {
+  appTemplate: string;
+  projectDir: string;
+  remixVersion?: string;
+  installDeps: boolean;
+  packageManager: "npm" | "yarn" | "pnpm";
+  useTypeScript: boolean;
+  githubToken?: string;
+  debug?: boolean;
+}) {
+  let spinner = ora("Creating your app…").start();
+  await createApp({
+    appTemplate,
+    projectDir,
+    remixVersion,
+    installDeps,
+    packageManager,
+    useTypeScript,
+    githubToken,
+    debug,
+  });
+  spinner.stop();
+  spinner.clear();
+}
+
+export async function init(
+  projectDir: string,
+  packageManager: "npm" | "yarn" | "pnpm"
+) {
+  let initScriptDir = path.join(projectDir, "remix.init");
+  let initScript = path.resolve(initScriptDir, "index.js");
+  let initPackageJson = path.resolve(initScriptDir, "package.json");
+
+  let isTypeScript = fse.existsSync(path.join(projectDir, "tsconfig.json"));
+
+  if (await fse.pathExists(initScript)) {
+    if (await fse.pathExists(initPackageJson)) {
+      execSync(`${packageManager} install`, {
+        stdio: "ignore",
+        cwd: initScriptDir,
+      });
+    }
+
+    let initFn = require(initScript);
+    try {
+      await initFn({ isTypeScript, packageManager, rootDirectory: projectDir });
+    } catch (error) {
+      if (error instanceof Error) {
+        error.message = `${colors.error("🚨 Oops, remix.init failed")}\n\n${
+          error.message
+        }`;
+      }
+      throw error;
+    }
+  }
+}
 
 export async function setup(platformArg?: string) {
-  let platform = isSetupPlatform(platformArg)
-    ? platformArg
-    : SetupPlatform.Node;
+  let platform: SetupPlatform;
+  if (
+    platformArg === "cloudflare-workers" ||
+    platformArg === "cloudflare-pages"
+  ) {
+    console.warn(
+      `Using '${platformArg}' as a platform value is deprecated. Use ` +
+        "'cloudflare' instead."
+    );
+    console.log("HINT: check the `postinstall` script in `package.json`");
+    platform = SetupPlatform.Cloudflare;
+  } else {
+    platform = isSetupPlatform(platformArg) ? platformArg : SetupPlatform.Node;
+  }
 
   await setupRemix(platform);
 
-  console.log(`Successfully setup Remix for ${platform}.`);
+  log(`Successfully setup Remix for ${platform}.`);
 }
 
 export async function routes(
-  remixRoot: string,
+  remixRoot?: string,
   formatArg?: string
 ): Promise<void> {
   let config = await readConfig(remixRoot);
@@ -43,14 +129,17 @@ export async function build(
 ): Promise<void> {
   let mode = isBuildMode(modeArg) ? modeArg : BuildMode.Production;
 
-  console.log(`Building Remix app in ${mode} mode...`);
+  log(`Building Remix app in ${mode} mode...`);
 
   if (modeArg === BuildMode.Production && sourcemap) {
     console.warn(
       "\n⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️"
     );
     console.warn(
-      "You have enabled source maps in production. This will make your server side code visible to the public and is highly discouraged! If you insist, please ensure you are using environment variables for secrets and not hard-coding them into your source!"
+      "You have enabled source maps in production. This will make your " +
+        "server-side code visible to the public and is highly discouraged! If " +
+        "you insist, please ensure you are using environment variables for " +
+        "secrets and not hard-coding them into your source!"
     );
     console.warn(
       "⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️\n"
@@ -59,9 +148,17 @@ export async function build(
 
   let start = Date.now();
   let config = await readConfig(remixRoot);
-  await compiler.build(config, { mode: mode, sourcemap });
+  fse.emptyDirSync(config.assetsBuildDirectory);
+  await compiler.build(config, {
+    mode: mode,
+    sourcemap,
+    onBuildFailure: (failure: compiler.BuildError) => {
+      compiler.formatBuildFailure(failure);
+      throw Error();
+    },
+  });
 
-  console.log(`Built in ${prettyMs(Date.now() - start)}`);
+  log(`Built in ${prettyMs(Date.now() - start)}`);
 }
 
 type WatchCallbacks = {
@@ -87,7 +184,7 @@ export async function watch(
   let wss = new WebSocket.Server({ port: config.devServerPort });
   function broadcast(event: { type: string; [key: string]: any }) {
     setTimeout(() => {
-      wss.clients.forEach(client => {
+      wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(event));
         }
@@ -121,7 +218,7 @@ export async function watch(
     },
     onFileDeleted(file) {
       log(`File deleted: ${path.relative(process.cwd(), file)}`);
-    }
+    },
   });
 
   console.log(`💿 Built in ${prettyMs(Date.now() - start)}`);
@@ -130,58 +227,77 @@ export async function watch(
   exitHook(() => {
     resolve();
   });
-  return new Promise<void>(r => {
+  return new Promise<void>((r) => {
     resolve = r;
   }).then(async () => {
     wss.close();
     await closeWatcher();
     fse.emptyDirSync(config.assetsBuildDirectory);
-    fse.emptyDirSync(config.serverBuildDirectory);
+    fse.rmSync(config.serverBuildPath);
   });
 }
 
 export async function dev(remixRoot: string, modeArg?: string) {
-  // TODO: Warn about the need to install @remix-run/serve if it isn't there?
   let createApp: typeof createAppType;
   let express: typeof Express;
   try {
+    // eslint-disable-next-line import/no-extraneous-dependencies
     let serve = require("@remix-run/serve");
     createApp = serve.createApp;
     express = require("express");
   } catch (err) {
     throw new Error(
-      "Could not locate @remix-run/serve. Please verify you have it installed to use the dev command."
+      "Could not locate @remix-run/serve. Please verify you have it installed " +
+        "to use the dev command."
     );
   }
 
   let config = await readConfig(remixRoot);
   let mode = isBuildMode(modeArg) ? modeArg : BuildMode.Development;
-  let port = process.env.PORT || 3000;
+
+  await loadEnv(config.rootDirectory);
+
+  let port = await getPort({
+    port: process.env.PORT ? Number(process.env.PORT) : makeRange(3000, 3100),
+  });
+
+  if (config.serverEntryPoint) {
+    throw new Error("remix dev is not supported for custom servers.");
+  }
 
   let app = express();
+  app.disable("x-powered-by");
   app.use((_, __, next) => {
-    purgeAppRequireCache(config.serverBuildDirectory);
+    purgeAppRequireCache(config.serverBuildPath);
     next();
   });
-  app.use(createApp(config.serverBuildDirectory, mode));
+  app.use(createApp(config.serverBuildPath, mode));
 
   let server: Server | null = null;
 
   try {
     await watch(config, mode, {
       onInitialBuild: () => {
-        let address = Object.values(os.networkInterfaces())
-          .flat()
-          .find(ip => ip?.family == "IPv4" && !ip.internal)?.address;
+        let onListen = () => {
+          let address =
+            process.env.HOST ||
+            Object.values(os.networkInterfaces())
+              .flat()
+              .find((ip) => ip?.family === "IPv4" && !ip.internal)?.address;
 
-        if (!address) {
-          throw new Error("Could not find an IPv4 address.");
-        }
+          if (!address) {
+            console.log(`Remix App Server started at http://localhost:${port}`);
+          } else {
+            console.log(
+              `Remix App Server started at http://localhost:${port} (http://${address}:${port})`
+            );
+          }
+        };
 
-        server = app.listen(port, () => {
-          console.log(`Remix App Server started at http://${address}:${port}`);
-        });
-      }
+        server = process.env.HOST
+          ? app.listen(port, process.env.HOST, onListen)
+          : app.listen(port, onListen);
+      },
     });
   } finally {
     server!?.close();

@@ -1,5 +1,6 @@
-import type { ActionFunction } from "remix";
-import { Form, json, useCatch, useActionData } from "remix";
+import type { ActionFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, useActionData, useCatch } from "@remix-run/react";
 import * as t from "io-ts";
 
 import { decodeFormData } from "../formData";
@@ -10,7 +11,7 @@ import { decodeFormData } from "../formData";
  */
 const User = t.type({
   name: t.string,
-  age: t.number
+  age: t.number,
 });
 
 type ActionData = {
@@ -20,7 +21,7 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  // Using `FormData` with TypeScript can be a little inconvinient:
+  // Using `FormData` with TypeScript can be a little inconvenient:
   //
   //     const formData = await request.formData();
   //     const name = formData.get("name");

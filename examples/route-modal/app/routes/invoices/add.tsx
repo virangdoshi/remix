@@ -1,26 +1,28 @@
 import Dialog from "@reach/dialog";
-import type { ActionFunction, LinksFunction } from "remix";
-import { useTransition } from "remix";
-import { redirect, useActionData } from "remix";
-import { Form } from "remix";
-import { useNavigate } from "remix";
-
 import styles from "@reach/dialog/styles.css";
+import type { ActionFunction, LinksFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useTransition,
+} from "@remix-run/react";
 
 export const links: LinksFunction = () => {
   return [
     {
       rel: "stylesheet",
-      href: styles
-    }
+      href: styles,
+    },
   ];
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  // Here we can update our dabatase with the new invoice
+  // Here we can update our database with the new invoice
 
   // This is just so we can see the transition
-  return new Promise(resolve =>
+  return new Promise((resolve) =>
     setTimeout(() => {
       resolve(redirect(`/invoices/`));
     }, 2000)
@@ -41,7 +43,7 @@ export default function Add() {
 
   return (
     <Dialog isOpen={true} aria-label="Add invoice" onDismiss={onDismiss}>
-      {transition.state === "submitting" && <div>Saving...</div>}
+      {transition.state === "submitting" ? <div>Saving...</div> : null}
       <h3>Add invoice</h3>
       <Form
         method="post"

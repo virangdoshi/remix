@@ -1,5 +1,7 @@
-import type { LoaderFunction } from "remix";
-import { Form, json, useLoaderData } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+
 import { auth, getSession } from "~/utils/auth.server";
 
 type LoaderData = {
@@ -18,7 +20,7 @@ export default function Screen() {
 
   return (
     <Form method="post" action="/auth0">
-      {error && <div>{error.message}</div>}
+      {error ? <div>{error.message}</div> : null}
       <button>Sign In with Auth0</button>
     </Form>
   );
