@@ -17,7 +17,7 @@ function getLoadContext(event, context) {
     netlifyGraphToken = event.authlifyToken;
   }
 
-  const authHeader = event.headers["authorization"];
+  const authHeader = event.headers.authorization;
   const graphSignatureHeader = event.headers["x-netlify-graph-signature"];
 
   if (authHeader != null && /Bearer /gi.test(authHeader)) {
@@ -26,7 +26,7 @@ function getLoadContext(event, context) {
 
   const loadContext = {
     clientNetlifyGraphAccessToken: rawAuthorizationString,
-    netlifyGraphToken: netlifyGraphToken,
+    netlifyGraphToken,
     netlifyGraphSignature: graphSignatureHeader,
   };
 

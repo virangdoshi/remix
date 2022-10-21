@@ -22,13 +22,13 @@ run(process.argv.slice(2)).then(
  * @param {string[]} args
  */
 async function run(args) {
-  let givenVersion = args[0];
-  let prereleaseId = args[1];
+  const givenVersion = args[0];
+  const prereleaseId = args[1];
 
   ensureCleanWorkingDirectory();
 
   // Get the next version number
-  let currentVersion = await getPackageVersion("remix");
+  const currentVersion = await getPackageVersion("remix");
   let nextVersion = semver.valid(givenVersion);
   if (nextVersion == null) {
     nextVersion = getNextVersion(currentVersion, givenVersion, prereleaseId);
@@ -36,7 +36,7 @@ async function run(args) {
 
   // Confirm the next version number
   if (prereleaseId !== "--skip-prompt") {
-    let answer = await prompt(
+    const answer = await prompt(
       `Are you sure you want to bump version ${currentVersion} to ${nextVersion}? [Yn] `
     );
     if (answer === false) return 0;
@@ -59,7 +59,7 @@ function getNextVersion(currentVersion, givenVersion, prereleaseId = "pre") {
 
   let nextVersion;
   if (givenVersion === "experimental") {
-    let hash = execSync(`git rev-parse --short HEAD`).toString().trim();
+    const hash = execSync("git rev-parse --short HEAD").toString().trim();
     nextVersion = `0.0.0-experimental-${hash}`;
   } else {
     // @ts-ignore

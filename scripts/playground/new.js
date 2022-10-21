@@ -3,16 +3,16 @@
 // this generates a new playground project in the .gitignored playground directory
 // yarn playground:new <?name>
 
-let path = require("path");
-let { execSync } = require("child_process");
-let fse = require("fs-extra");
+const path = require("path");
+const { execSync } = require("child_process");
+const fse = require("fs-extra");
 
 createNewProject(process.argv[2]);
 
 async function createNewProject(name = `playground-${Date.now()}`) {
-  let projectDir = path.join(__dirname, "../../playground", name);
-  let localTemplate = path.join(__dirname, "template.local");
-  let hasLocalTemplate = fse.existsSync(localTemplate);
+  const projectDir = path.join(__dirname, "../../playground", name);
+  const localTemplate = path.join(__dirname, "template.local");
+  const hasLocalTemplate = fse.existsSync(localTemplate);
   if (hasLocalTemplate) {
     console.log(`ℹ️  Using local template: ${localTemplate}`);
   } else {
@@ -23,7 +23,7 @@ async function createNewProject(name = `playground-${Date.now()}`) {
       )} and we'll use that one instead.`
     );
   }
-  let templateDir = hasLocalTemplate
+  const templateDir = hasLocalTemplate
     ? localTemplate
     : path.join(__dirname, "template");
   if (await fse.pathExists(projectDir)) {
@@ -38,23 +38,23 @@ async function createNewProject(name = `playground-${Date.now()}`) {
   });
 
   console.log("📥  Installing deps...");
-  execSync(`npm install`, { stdio: "inherit", cwd: projectDir });
+  execSync("npm install", { stdio: "inherit", cwd: projectDir });
 
-  let remixDeps = path.join(__dirname, "../../build/node_modules");
+  const remixDeps = path.join(__dirname, "../../build/node_modules");
 
   console.log("🏗  Building remix...");
-  execSync(`yarn rollup -c`, { stdio: "inherit" });
+  execSync("yarn rollup -c", { stdio: "inherit" });
 
   console.log("🚚  Copying remix deps...");
   await fse.copy(remixDeps, path.join(projectDir, "node_modules"), {
     overwrite: true,
   });
 
-  let relativeProjectDir = projectDir.replace(process.cwd(), ".");
-  let hasInit = fse.existsSync(path.join(projectDir, "remix.init"));
+  const relativeProjectDir = projectDir.replace(process.cwd(), ".");
+  const hasInit = fse.existsSync(path.join(projectDir, "remix.init"));
   if (hasInit) {
     console.log("🎬  Running Remix Init...");
-    execSync(`node ./node_modules/@remix-run/dev/dist/cli init`, {
+    execSync("node ./node_modules/@remix-run/dev/dist/cli init", {
       stdio: "inherit",
       cwd: projectDir,
     });

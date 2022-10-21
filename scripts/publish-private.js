@@ -6,7 +6,7 @@ const jsonfile = require("jsonfile");
 const buildDir = path.resolve(__dirname, "../build/node_modules");
 
 function getTaggedVersion() {
-  let output = execSync("git tag --list --points-at HEAD").toString().trim();
+  const output = execSync("git tag --list --points-at HEAD").toString().trim();
   return output.replace(/^v/g, "");
 }
 
@@ -20,15 +20,15 @@ function publish(dir, tag) {
 
 async function run() {
   // Make sure there's a current tag
-  let taggedVersion = getTaggedVersion();
+  const taggedVersion = getTaggedVersion();
   if (taggedVersion === "") {
     console.error("Missing release version. Run the version script first.");
     process.exit(1);
   }
 
-  let prerelease = semver.prerelease(taggedVersion);
-  let prereleaseTag = prerelease ? String(prerelease[0]) : undefined;
-  let tag = prereleaseTag
+  const prerelease = semver.prerelease(taggedVersion);
+  const prereleaseTag = prerelease ? String(prerelease[0]) : undefined;
+  const tag = prereleaseTag
     ? prereleaseTag.includes("nightly")
       ? "nightly"
       : prereleaseTag.includes("experimental")
@@ -37,7 +37,7 @@ async function run() {
     : "latest";
 
   // Publish all @remix-run/* packages
-  for (let name of [
+  for (const name of [
     "dev",
     "server-runtime", // publish before platforms
     "cloudflare",
@@ -75,8 +75,8 @@ run().then(
  * @param {(json: import('type-fest').PackageJson) => any} transform
  */
 async function updatePackageConfig(packageName, transform) {
-  let file = path.join(buildDir, "@remix-run", packageName, "package.json");
-  let json = await jsonfile.readFile(file);
+  const file = path.join(buildDir, "@remix-run", packageName, "package.json");
+  const json = await jsonfile.readFile(file);
   transform(json);
   await jsonfile.writeFile(file, json, { spaces: 2 });
 }

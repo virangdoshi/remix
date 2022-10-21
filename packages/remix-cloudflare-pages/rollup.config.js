@@ -13,9 +13,9 @@ const { name: packageName, version } = require("./package.json");
 
 /** @returns {import("rollup").RollupOptions[]} */
 module.exports = function rollup() {
-  let sourceDir = "packages/remix-cloudflare-pages";
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
+  const sourceDir = "packages/remix-cloudflare-pages";
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
 
   return [
     {

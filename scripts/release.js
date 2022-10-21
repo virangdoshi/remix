@@ -49,9 +49,9 @@ async function run(args) {
     givenVersion = args[1];
   }
 
-  let allTags = getAllTags();
-  let currentBranch = getCurrentBranch();
-  let gitArgs = { tags: allTags, initialBranch: currentBranch };
+  const allTags = getAllTags();
+  const currentBranch = getCurrentBranch();
+  const gitArgs = { tags: allTags, initialBranch: currentBranch };
 
   switch (phase) {
     case "start": {
@@ -76,7 +76,7 @@ async function run(args) {
     throw Error(`Version ${nextVersion} has already been released.`);
   }
 
-  let answer = await prompt(
+  const answer = await prompt(
     `Are you sure you want to release version ${chalk.bold(nextVersion)}? [Yn] `
   );
   if (answer === false) return 0;
@@ -96,7 +96,7 @@ async function run(args) {
     }
   }
 
-  let versionTag = getVersionTag(nextVersion);
+  const versionTag = getVersionTag(nextVersion);
 
   console.log(
     chalk.green(
@@ -143,11 +143,11 @@ async function initStart(givenVersion, git) {
  */
 async function initBump(git) {
   ensureLatestReleaseBranch(git.initialBranch, git);
-  let versionFromBranch = getVersionFromReleaseBranch(git.initialBranch);
-  let currentVersion = git.tags
+  const versionFromBranch = getVersionFromReleaseBranch(git.initialBranch);
+  const currentVersion = git.tags
     .filter((tag) => tag.startsWith("v" + versionFromBranch))
     .sort((a, b) => (a > b ? -1 : a < b ? 1 : 0))[0];
-  let nextVersion = semver.inc(currentVersion, "prerelease");
+  const nextVersion = semver.inc(currentVersion, "prerelease");
   if (!nextVersion) {
     throw Error(`Invalid semver version: ${currentVersion}`);
   }
@@ -160,7 +160,7 @@ async function initBump(git) {
  */
 async function initFinish(git) {
   ensureLatestReleaseBranch(git.initialBranch, git);
-  let nextVersion = getVersionFromReleaseBranch(git.initialBranch);
+  const nextVersion = getVersionFromReleaseBranch(git.initialBranch);
   return nextVersion;
 }
 
@@ -168,7 +168,7 @@ async function initFinish(git) {
  * @param {string} nextVersion
  */
 async function execStart(nextVersion) {
-  let releaseBranch = getReleaseBranch(nextVersion);
+  const releaseBranch = getReleaseBranch(nextVersion);
 
   await gitPull("dev");
   try {
@@ -231,7 +231,7 @@ async function execFinish(nextVersion, git) {
  * @param {{ pullFirst?: boolean }} [opts]
  */
 async function gitMerge(from, to, opts = {}) {
-  let initialBranch = getCurrentBranch();
+  const initialBranch = getCurrentBranch();
   execSync(`git checkout ${from}`);
   if (opts.pullFirst) {
     await gitPull(from);
@@ -250,7 +250,7 @@ async function gitMerge(from, to, opts = {}) {
   }
 
   if (summary.conflicts.length > 0) {
-    let answer = await prompt(
+    const answer = await prompt(
       `Merge conflicts detected. Resolve all conflicts and commit the changes before resuming the process.
           ${chalk.bold("Press Y to continue or N to cancel the release.")}`
     );
@@ -269,9 +269,9 @@ async function gitMerge(from, to, opts = {}) {
  */
 async function gitPull(branch) {
   try {
-    let resp = execSync(`git pull --rebase origin ${branch}`).toString();
+    const resp = execSync(`git pull --rebase origin ${branch}`).toString();
     if (hasMergeConflicts(resp)) {
-      let answer = await prompt(
+      const answer = await prompt(
         `Merge conflicts detected. Resolve all conflicts and commit the changes before resuming the process.
 
     ${chalk.bold("Press Y to continue or N to cancel the release.")}`
@@ -299,7 +299,7 @@ function getNextVersion(currentVersion, givenVersion, prereleaseId = "pre") {
     );
   }
   // @ts-ignore
-  let nextVersion = semver.inc(currentVersion, givenVersion, prereleaseId);
+  const nextVersion = semver.inc(currentVersion, givenVersion, prereleaseId);
   if (nextVersion == null) {
     throw Error(`Invalid version specifier: ${givenVersion}`);
   }
@@ -307,7 +307,7 @@ function getNextVersion(currentVersion, givenVersion, prereleaseId = "pre") {
 }
 
 function getCurrentBranch() {
-  let output = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
+  const output = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
   return output;
 }
 
@@ -316,7 +316,7 @@ function getCurrentBranch() {
  * @returns {boolean}
  */
 function hasMergeConflicts(output) {
-  let lines = output.trim().split("\n");
+  const lines = output.trim().split("\n");
   return lines.some((line) => /^CONFLICT\s/.test(line));
 }
 
@@ -325,7 +325,7 @@ function hasMergeConflicts(output) {
  * @returns {boolean}
  */
 function mergeFailed(output) {
-  let lines = output.trim().split("\n");
+  const lines = output.trim().split("\n");
   return lines.some((line) => /^Automatic merge failed;\s/.test(line));
 }
 
@@ -333,7 +333,7 @@ function mergeFailed(output) {
  * @param {string} branch
  */
 function checkoutNewBranch(branch) {
-  let output = execSync(`git checkout -b ${branch}`).toString().trim();
+  const output = execSync(`git checkout -b ${branch}`).toString().trim();
   if (/^fatal:/.test(output)) {
     throw Error(`Branch ${chalk.bold(output)} already exists.`);
   }
@@ -358,7 +358,7 @@ function ensureDevBranch(branch) {
  * @param {string} branch
  */
 function ensureReleaseBranch(branch) {
-  let version = getVersionFromReleaseBranch(branch);
+  const version = getVersionFromReleaseBranch(branch);
   if (version == null || !semver.valid(version)) {
     throw Error(
       "You must be on a valid release branch when continuing the release process."
@@ -372,12 +372,12 @@ function ensureReleaseBranch(branch) {
  * @param {GitAttributes} git
  */
 function ensureLatestReleaseBranch(branch, git) {
-  let versionFromBranch = ensureReleaseBranch(branch);
-  let taggedVersions = git.tags
+  const versionFromBranch = ensureReleaseBranch(branch);
+  const taggedVersions = git.tags
     .filter((tag) => /^v\d/.test(tag))
     .sort(semver.compare);
 
-  let latestTaggedVersion = taggedVersions[taggedVersions.length - 1];
+  const latestTaggedVersion = taggedVersions[taggedVersions.length - 1];
   if (semver.compare(latestTaggedVersion, versionFromBranch) > 0) {
     throw Error(
       "You must be on the latest release branch when continuing the release process."

@@ -10,7 +10,7 @@ const REPO_ROOT_DIR = __dirname;
 
 let activeOutputDir = "build";
 if (process.env.REMIX_LOCAL_BUILD_DIRECTORY) {
-  let appDir = path.join(
+  const appDir = path.join(
     process.cwd(),
     process.env.REMIX_LOCAL_BUILD_DIRECTORY
   );
@@ -34,7 +34,7 @@ if (process.env.REMIX_LOCAL_BUILD_DIRECTORY) {
  * @param {boolean} [executable]
  */
 function createBanner(packageName, version, executable = false) {
-  let banner = `/**
+  const banner = `/**
  * ${packageName} v${version}
  *
  * Copyright (c) Remix Software Inc.
@@ -68,17 +68,17 @@ async function triggerLiveReload(appDir) {
   // Tickle live reload by touching the server entry
   // Consider all of entry.server.{tsx,ts,jsx,js} since React may be used
   // via `React.createElement` without the need for JSX.
-  let serverEntryPaths = [
+  const serverEntryPaths = [
     "entry.server.ts",
     "entry.server.tsx",
     "entry.server.js",
     "entry.server.jsx",
   ];
-  let serverEntryPath = serverEntryPaths
+  const serverEntryPath = serverEntryPaths
     .map((entryFile) => path.join(appDir, "app", entryFile))
     .find((entryPath) => fse.existsSync(entryPath));
   if (serverEntryPath) {
-    let date = new Date();
+    const date = new Date();
     await fs.promises.utimes(serverEntryPath, date, date);
   }
 }
@@ -88,8 +88,8 @@ async function triggerLiveReload(appDir) {
  * @returns {import("rollup").Plugin}
  */
 function copyPublishFiles(packageName) {
-  let sourceDir = `packages/${getPackageDirname(packageName)}`;
-  let outputDir = getOutputDir(packageName);
+  const sourceDir = `packages/${getPackageDirname(packageName)}`;
+  const outputDir = getOutputDir(packageName);
   return copy({
     targets: [
       { src: "LICENSE.md", dest: [outputDir, sourceDir] },
@@ -108,15 +108,15 @@ function copyToPlaygrounds() {
     name: "copy-to-remix-playground",
     async writeBundle(options, bundle) {
       if (activeOutputDir === "build") {
-        let playgroundsDir = path.join(REPO_ROOT_DIR, "playground");
-        let playgrounds = await fs.promises.readdir(playgroundsDir);
-        let writtenDir = path.join(REPO_ROOT_DIR, options.dir);
-        for (let playground of playgrounds) {
-          let playgroundDir = path.join(playgroundsDir, playground);
+        const playgroundsDir = path.join(REPO_ROOT_DIR, "playground");
+        const playgrounds = await fs.promises.readdir(playgroundsDir);
+        const writtenDir = path.join(REPO_ROOT_DIR, options.dir);
+        for (const playground of playgrounds) {
+          const playgroundDir = path.join(playgroundsDir, playground);
           if (!fse.statSync(playgroundDir).isDirectory()) {
             continue;
           }
-          let destDir = writtenDir.replace(
+          const destDir = writtenDir.replace(
             path.join(REPO_ROOT_DIR, "build"),
             playgroundDir
           );
@@ -137,11 +137,11 @@ function copyToPlaygrounds() {
  */
 function getAdapterConfig(adapterName) {
   /** @type {`@remix-run/${RemixAdapter}`} */
-  let packageName = `@remix-run/${adapterName}`;
-  let sourceDir = `packages/remix-${adapterName}`;
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
-  let version = getVersion(sourceDir);
+  const packageName = `@remix-run/${adapterName}`;
+  const sourceDir = `packages/remix-${adapterName}`;
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
+  const version = getVersion(sourceDir);
 
   return {
     external(id) {
@@ -178,12 +178,12 @@ function magicExportsPlugin({ packageName, version }) {
   return {
     name: `${packageName}:generate-magic-exports`,
     generateBundle() {
-      let magicExports = getMagicExports(packageName);
+      const magicExports = getMagicExports(packageName);
       if (!magicExports) {
         return;
       }
 
-      let banner = createBanner(packageName, version);
+      const banner = createBanner(packageName, version);
       let esmContents = banner + "\n";
       let tsContents = banner + "\n";
       let cjsContents =
@@ -193,13 +193,13 @@ function magicExportsPlugin({ packageName, version }) {
         "Object.defineProperty(exports, '__esModule', { value: true });\n";
 
       if (magicExports.values) {
-        let exportList = magicExports.values.join(", ");
+        const exportList = magicExports.values.join(", ");
         esmContents += `export { ${exportList} } from '${packageName}';\n`;
         tsContents += `export { ${exportList} } from '${packageName}';\n`;
 
-        let cjsModule = camelCase(packageName.slice("@remix-run/".length));
+        const cjsModule = camelCase(packageName.slice("@remix-run/".length));
         cjsContents += `var ${cjsModule} = require('${packageName}');\n`;
-        for (let symbol of magicExports.values) {
+        for (const symbol of magicExports.values) {
           cjsContents +=
             `Object.defineProperty(exports, '${symbol}', {\n` +
             "  enumerable: true,\n" +
@@ -209,7 +209,7 @@ function magicExportsPlugin({ packageName, version }) {
       }
 
       if (magicExports.types) {
-        let exportList = magicExports.types.join(", ");
+        const exportList = magicExports.types.join(", ");
         tsContents += `export type { ${exportList} } from '${packageName}';\n`;
       }
 
@@ -240,7 +240,7 @@ function magicExportsPlugin({ packageName, version }) {
 function getMagicExports(packageName) {
   // Re-export everything from packages that is available in `remix`
   /** @type {Record<ScopedRemixPackage, MagicExports>} */
-  let magicExportsByPackageName = {
+  const magicExportsByPackageName = {
     "@remix-run/architect": {
       values: ["createArcTableSessionStorage"],
     },
@@ -363,9 +363,9 @@ function getMagicExports(packageName) {
  * @returns {import("rollup").RollupOptions}
  */
 function getCliConfig({ packageName, version }) {
-  let sourceDir = `packages/${getPackageDirname(packageName)}`;
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
+  const sourceDir = `packages/${getPackageDirname(packageName)}`;
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
   return {
     external() {
       return true;
@@ -400,7 +400,7 @@ function getOutputDir(packageName) {
  * @param {string} packageName
  */
 function getPackageDirname(packageName) {
-  let scope = "@remix-run/";
+  const scope = "@remix-run/";
   return packageName.startsWith(scope)
     ? `remix-${packageName.slice(scope.length)}`
     : packageName;

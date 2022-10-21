@@ -11,8 +11,8 @@ const main = async (migration) => {
     process.exit(1);
   }
 
-  let buildPath = join(__dirname, "../", "build");
-  let cliPath = join(
+  const buildPath = join(__dirname, "../", "build");
+  const cliPath = join(
     buildPath,
     "node_modules",
     "@remix-run",
@@ -20,12 +20,12 @@ const main = async (migration) => {
     "dist",
     "cli.js"
   );
-  let examplesPath = join(process.cwd(), "examples");
-  let examples = await readdir(examplesPath);
+  const examplesPath = join(process.cwd(), "examples");
+  const examples = await readdir(examplesPath);
 
   examples.forEach(async (example) => {
-    let examplePath = join(examplesPath, example);
-    let stats = await stat(examplePath);
+    const examplePath = join(examplesPath, example);
+    const stats = await stat(examplePath);
 
     if (!stats.isDirectory()) {
       return;
