@@ -5,9 +5,9 @@ const { execSync } = require("child_process");
 const jsonfile = require("jsonfile");
 const Confirm = require("prompt-confirm");
 
-let rootDir = path.resolve(__dirname, "..");
+const rootDir = path.resolve(__dirname, "..");
 
-let remixPackages = {
+const remixPackages = {
   adapters: [
     "architect",
     "cloudflare-pages",
@@ -37,8 +37,8 @@ function packageJson(packageName, directory = "") {
  * @returns {Promise<string | undefined>}
  */
 async function getPackageVersion(packageName) {
-  let file = packageJson(packageName, "packages");
-  let json = await jsonfile.readFile(file);
+  const file = packageJson(packageName, "packages");
+  const json = await jsonfile.readFile(file);
   return json.version;
 }
 
@@ -46,8 +46,8 @@ async function getPackageVersion(packageName) {
  * @returns {void}
  */
 function ensureCleanWorkingDirectory() {
-  let status = execSync(`git status --porcelain`).toString().trim();
-  let lines = status.split("\n");
+  const status = execSync("git status --porcelain").toString().trim();
+  const lines = status.split("\n");
   if (!lines.every((line) => line === "" || line.startsWith("?"))) {
     console.error(
       "Working directory is not clean. Please commit or stash your changes."
@@ -61,8 +61,8 @@ function ensureCleanWorkingDirectory() {
  * @returns {Promise<string | boolean>}
  */
 async function prompt(question) {
-  let confirm = new Confirm(question);
-  let answer = await confirm.run();
+  const confirm = new Confirm(question);
+  const answer = await confirm.run();
   return answer;
 }
 
@@ -71,18 +71,16 @@ async function prompt(question) {
  * @param {(json: import('type-fest').PackageJson) => any} transform
  */
 async function updatePackageConfig(packageName, transform) {
-  let file = packageJson(packageName, "packages");
+  const file = packageJson(packageName, "packages");
   try {
-    let json = await jsonfile.readFile(file);
+    const json = await jsonfile.readFile(file);
     if (!json) {
       console.log(`No package.json found for ${packageName}; skipping`);
       return;
     }
     transform(json);
     await jsonfile.writeFile(file, json, { spaces: 2 });
-  } catch (err) {
-    return;
-  }
+  } catch (err) {}
 }
 
 /**
@@ -93,7 +91,7 @@ async function updatePackageConfig(packageName, transform) {
 async function updateRemixVersion(packageName, nextVersion, successMessage) {
   await updatePackageConfig(packageName, (config) => {
     config.version = nextVersion;
-    for (let pkg of remixPackages.all) {
+    for (const pkg of remixPackages.all) {
       if (config.dependencies?.[`@remix-run/${pkg}`]) {
         config.dependencies[`@remix-run/${pkg}`] = nextVersion;
       }
@@ -105,7 +103,7 @@ async function updateRemixVersion(packageName, nextVersion, successMessage) {
       }
     }
   });
-  let logName = packageName.startsWith("remix-")
+  const logName = packageName.startsWith("remix-")
     ? `@remix-run/${packageName.slice(6)}`
     : packageName;
   console.log(
@@ -123,8 +121,8 @@ async function updateRemixVersion(packageName, nextVersion, successMessage) {
  * @param {string} nextVersion
  */
 async function updateDeploymentScriptVersion(nextVersion) {
-  let file = packageJson("deployment-test", "scripts");
-  let json = await jsonfile.readFile(file);
+  const file = packageJson("deployment-test", "scripts");
+  const json = await jsonfile.readFile(file);
   json.dependencies["@remix-run/dev"] = nextVersion;
   await jsonfile.writeFile(file, json, { spaces: 2 });
 
@@ -143,11 +141,11 @@ async function updateDeploymentScriptVersion(nextVersion) {
  */
 const getPackageNameFromImportSpecifier = (importSpecifier) => {
   if (importSpecifier.startsWith("@")) {
-    let [scope, pkg, ...path] = importSpecifier.split("/");
+    const [scope, pkg, ...path] = importSpecifier.split("/");
     return [`${scope}/${pkg}`, path.join("/")];
   }
 
-  let [pkg, ...path] = importSpecifier.split("/");
+  const [pkg, ...path] = importSpecifier.split("/");
   return [pkg, path.join("/")];
 };
 /**
@@ -155,14 +153,14 @@ const getPackageNameFromImportSpecifier = (importSpecifier) => {
  * @param {string} nextVersion
  */
 const updateDenoImportMap = async (importMapPath, nextVersion) => {
-  let { imports, ...json } = await jsonfile.readFile(importMapPath);
-  let remixPackagesFull = remixPackages.all.map(
+  const { imports, ...json } = await jsonfile.readFile(importMapPath);
+  const remixPackagesFull = remixPackages.all.map(
     (remixPackage) => `@remix-run/${remixPackage}`
   );
 
-  let newImports = Object.fromEntries(
+  const newImports = Object.fromEntries(
     Object.entries(imports).map(([importName, path]) => {
-      let [packageName, importPath] =
+      const [packageName, importPath] =
         getPackageNameFromImportSpecifier(importName);
 
       return remixPackagesFull.includes(packageName)
@@ -190,7 +188,7 @@ async function incrementRemixVersion(nextVersion) {
   // Update version numbers in package.json for all packages
   await updateRemixVersion("remix", nextVersion);
   await updateRemixVersion("create-remix", nextVersion);
-  for (let name of remixPackages.all) {
+  for (const name of remixPackages.all) {
     await updateRemixVersion(`remix-${name}`, nextVersion);
   }
 

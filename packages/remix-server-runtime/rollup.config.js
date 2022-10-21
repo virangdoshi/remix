@@ -25,9 +25,9 @@ const replacePlugin = replace({
 
 /** @returns {import("rollup").RollupOptions[]} */
 module.exports = function rollup() {
-  let sourceDir = "packages/remix-server-runtime";
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
+  const sourceDir = "packages/remix-server-runtime";
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
 
   return [
     {

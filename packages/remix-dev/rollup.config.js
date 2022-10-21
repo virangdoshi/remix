@@ -14,9 +14,9 @@ const { name: packageName, version } = require("./package.json");
 
 /** @returns {import("rollup").RollupOptions[]} */
 module.exports = function rollup() {
-  let sourceDir = "packages/remix-dev";
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
+  const sourceDir = "packages/remix-dev";
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
 
   return [
     {
@@ -47,7 +47,7 @@ module.exports = function rollup() {
         nodeResolve({ extensions: [".ts"] }),
         copy({
           targets: [
-            { src: `LICENSE.md`, dest: [outputDir, sourceDir] },
+            { src: "LICENSE.md", dest: [outputDir, sourceDir] },
             { src: `${sourceDir}/package.json`, dest: [outputDir, outputDist] },
             { src: `${sourceDir}/README.md`, dest: outputDir },
             {

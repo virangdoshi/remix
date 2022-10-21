@@ -8,7 +8,7 @@ const {
   createBanner,
   getOutputDir,
 } = require("../../rollup.utils");
-let { name: packageName, version } = require("./package.json");
+const { name: packageName, version } = require("./package.json");
 
 /** @returns {import("rollup").RollupOptions[]} */
 module.exports = function rollup() {
@@ -18,9 +18,9 @@ module.exports = function rollup() {
     return [];
   }
 
-  let sourceDir = "packages/remix";
-  let outputDir = getOutputDir(packageName);
-  let outputDist = path.join(outputDir, "dist");
+  const sourceDir = "packages/remix";
+  const outputDir = getOutputDir(packageName);
+  const outputDist = path.join(outputDir, "dist");
 
   return [
     {
